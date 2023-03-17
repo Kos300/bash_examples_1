@@ -15,4 +15,3 @@ read use
           nmap -PE $IP -oN resultip
         cat resultip
     fi
-done
