@@ -1,0 +1,407 @@
+linux
+создать файл <name>.sh
+
+любой редактор: nano, vim, vi
+
+
+
+
+
+== ПЕРВЫЙ СКРИПТ ==
+1 строка = какой компилятор использовать
+#!/bin/bash
+
+= вывести текст в терминал
+echo "Message from script"
+echo "Files in this folder:"
+= вывести содержание каталога
+ls
+
+xterm = Запуск нового терминала
+& = не ждать, выполнять дальше
+xterm &
+
+= вывести содержание каталога
+ls -l
+
+echo "Done"
+
+ЗАПУСК СКРИПТА
+= нужен приоритет X (execute)
+= без него тоже будет работать, если указывать чем запускать
+
+команда запуска
+./<script name>.sh => без права запуcка - будет permission denied.
+запуск с указанием компилятора
+bash <script name>.sh = запустится даже без разрешений
+
+ИЗМЕНИМ РАЗРЕШЕНИЯ, запросит пароль
+a = всем user, group, others
++x = добавить право запуска execute
+sudo chmod a+x <script name>.sh
+
+теперь запустится командой
+./<script name>.sh
+
+
+
+
+
+
+== ВТОРОЙ СКРИПТ ==
+(с передачей параметров)
+создать файл, редактором nano
+nano myscript2.sh
+
+#!/bin/bash
+
+переменные, без пробелов
+    . команды в таких кавычках ``, там где ~.
+    . uname -a = имя системы, полностью
+mycomputer="notebook"
+myOS=`uname -a`
+
+    $0 - это имя самого файла, а далее $1,$2,... это имена передаваемых переменных.
+echo "This script name is $0"
+echo "Hello $1"
+echo "Hello $2"
+
+num1=50
+num2=45
+sum=$((num1+num2))
+echo "$num1 + $num2 = $sum"
+
+    название компьютера
+myhost=`hostname`
+mygtw="8.8.8.8"
+
+ping -c 4 $myhost
+ping -с 4 $mygtw
+
+    echo -n = no new line = вывод без переноса строки
+echo -n "This is done"
+echo "Really done"
+
+ Очистить терминал
+clear
+
+
+
+
+
+=== ТРЕТИЙ СКРИПТ ==
+
+#!/bin/bash
+
+    = запись условий через if
+if [ "$1" == "Bob" ]; then
+        echo "Hi, $1"
+elif [ "$1" == "Mehmed" ]; then
+        echo "Merhaba, $1"
+else
+        echo "Wassup, $1"
+fi
+
+    = запись условий через case
+    вариант ввода параметра X в терминале
+echo "Please enter something:"
+read x
+
+    еще вариант ввода параметра X в терминале
+read -p "Please enter something: " x
+
+    вариант ввода параметра в команде запуска файла
+x=$2
+echo "Starting CASE selection..."
+case $x in
+        1) echo "This is one";;
+    [2-9]) echo "Two-nine";;
+    "Bob") echo "Hello, $x";;
+        *) echo "Parametr unknown!";;
+esac
+
+
+
+
+
+
+=== ЧЕТВЕРТЫЙ СКРИПТ ===
+    -lt = меньше чем
+
+#!/bin/bash
+
+read -p "Please enter number for counter: " x
+
+COUNTER=1
+
+while [ $COUNTER -lt $((x+1)) ]; do
+        echo "Current counter is $COUNTER"
+        COUNTER=$((COUNTER+1))
+        # let COUNTER=COUNTER+1
+        # let COUNTER+=1
+done
+
+    = ПРИМЕР: выведет в терминал содержимое всех файлов txt в каталоге
+for myfile in `ls *.txt`; do
+    cat $myfile
+done
+
+    ВЫВОД НЕ СРАБОТАЛ ЗАПУСКАЛ ЧЕРЕЗ SH, через bash должен работать
+for x in {1..10}; do
+    echo "X = $x"
+done
+
+    А ЭТОТ СРАБОТАЛ через SH
+echo "Trying to print range..."
+b=10
+for x in $(seq $b); do
+    echo "X = $x"
+done
+
+    ВЫВОД НЕ СРАБОТАЛ ЗАПУСКАЛ ЧЕРЕЗ SH, через bash должен работать
+echo "Trying to print Numbers..."
+for (( i=1; i<=10; i++ )); do
+    echo "Number I = $i"
+done
+
+
+
+
+
+
+=== ПЯТЫЙ СКРИПТ ===
+функции, Сначала записали функцию myFunction() {},
+потом вызвали myFunction указав параметры срез пробел
+
+#!/bin/bash
+myFunction()
+{
+    echo "This is text from Function!"
+    echo "First parametr is: $1"
+    echo "Second parametr is: $2"
+    echo "Sum = $(($1+$2))"
+
+}
+myFunction 50 60
+
+    ### ВЫВОД в терминал
+    This is text from Function!
+    First parametr is: 50
+    First parametr is: 210
+    Sum = 260
+
+
+
+
+
+=== ШЕСТОЙ СКРИПТ ===
+установка редактора VIM
+
+создадим файл с example_script.sh с кодом:
+    #!/bin/bash  == это ШЕБАНГ - указывает на интерпретатор bin/bash
+        ("#!" = Шебанг  (англ. shebang, sha-bang,[1][2][3] hashbang,[4][5] pound-bang,[2][6] or hash-pling[2][7]))
+    apt install -y vim
+    mkdir test
+    touch test/test.txt
+    echo "I am a test" > test/test.txt
+
+после сохранения файла,
+нужно дать права на его выполнение, командой ==
+    chmod +x example_script.sh
+
+выполнить файл например по относительному пути
+    ./example_script.sh == CTRL +С (пропустить)
+
+запуск скрипта от супер пользователя
+    sudo ./example_script.sh
+
+после выполнения проверим
+созданы ли папка, файл с текстом
+    ls == смотрим содержимое каталога
+    cat test/test.txt == выводим текст файла в терминал
+
+
+
+
+
+=== СЕДЬМОЙ ПРИМЕР ===
+добавление пользователей
+добавление пользователей в группу sudo
+
+создадим файл редактором vim
+    vim users.txt
+содержимое файла
+    alice:admin
+    bob
+    dima:admin
+    alex
+
+еще скрипт
+    vim another_script.sh
+.считываем файл users в переменную
+.циклом считываем строку
+.если содержит admin
+.делим строку на две части с помощью cut
+( -d указываем разделитель ':', -f 1 указываем часть которую хотим взять 1= первая часть)
+. создать пользователя useradd $user
+. добавить пользователя в группу sudo
+(usermod $user -G sudo)
+. если не строка не содержит admin, то
+просто создать пользователя useradd $user
+
+содержимое
+    #!/bin/bash
+    users=$(cat users.txt)
+    for user in $users
+    do
+        if [[ $user == *"admin" ]]
+        then
+            user=$(echo $user | cut -d `:` -f 1)
+            useradd $user
+            usermod $user -G sudo
+        else
+            useradd $user
+        fi
+    done
+
+сохранить и выйти из vim
+    wq!
+даем права на выполнение к этому файлу
+    сhmod +x another_script.sh
+выполним файл
+    sudo ./another_script.sh
+
+проверим создались ли пользователи,
+и добавлены ли они в группу
+    vim /etc/passwd == откроет файл, в конце будут добавленные пользователи
+
+    vim /etc/group == откроет файл с группами, в группе sudo будут пользователи alice и dima.
+
+
+
+
+
+
+=== ВОСЬМОЙ ПРИМЕР ===
+скрипт для автоматизации поиска открытых портов на
+включенных хостах подсети (или отдельного ip адреса) с помощью утилиты NMAP
+https://nmap.org/
+
+= ДЛЯ ПОСДСЕТИ =
+введите подсеть
+введите порт
+(nmap -p $port -sT $subnet -oG res)
+    -p == отвечает за скан портов
+    -sT == сканировать нужно порты типа TCP
+    oG == применяет grep для создания файла с именем res == полный список результатов
+cat res |grep open >result
+    открываем результаты и фильтруем с параметром open, сохраняем в файл result
+cat result
+    вывести результат
+
+ЗАПУСК
+перейти в каталог с файлом скрипта
+ls
+    список содержимого каталога
+chmod 775 scan == (scan - имя файла)
+    изменить доступы для файла
+bash scan
+    запустить файл
+далее:
+    enter subnet == например 192.168.0.0/24
+    enter port == например 22
+скрипт выполнится, файлы создадутся.
+в файле result:
+    Host: 192.168.0.1() Ports: 22/open/tcp//ssh///
+
+= ДЛЯ IP =
+(nmap -PE $IP -oN resultip)
+    -P == ping
+    -oN == сохраняет результаты в файл
+cat resultip
+    выводит на экран содержимое файла
+далее запускаем:
+    enter ip == например 192.168.0.1
+получим список открытых портов по заданному IP адресу в терминале, и в файле.
+
+
+
+#!/bin/bash
+echo "What do you want to scan: subnet/ip"
+read use
+    if [ "$use" = "subnet" ]; then
+        echo "Enter subnet:"
+        read subnet
+        echo "Enter port:"
+        read port
+        nmap -p $port -sT $subnet -oG res
+        cat res |grep open >result
+        cat result
+    else
+        echo "Enter IP:"
+        read IP
+        nmap -PE $IP -oN resultip
+        cat resultip
+    fi
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
